@@ -1,7 +1,10 @@
+import prisma from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
-export function GET(request : NextRequest){
-    const cookies = request.cookies.get("login-token")?.value
+export async function POST(request : NextRequest){
+    const body = await request.json();
+    console.log(body);
 
-    console.log("Get request recieved at / api/products");
+    prisma
+
 }

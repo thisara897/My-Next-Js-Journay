@@ -15,7 +15,7 @@ const userData: Prisma.UserCreateInput[] = [
         email : "admin@saloonleo.lk",
         firstName : "Admin",
         lastName : "Leo",
-        password : "$2a$12$pgba3yfzhBQxUZEdplkBK.n0hdHqt/NdPiOttuGEcmeYqPMYCQbq2",
+        password : "$2a$12$pgba3yfzhBQxUZEdplkBK.n0hdHqt/NdPiOttuGEcmeYqPMYCQbq2", //123
         role : "ADMIN",
         privilages : []
 

@@ -23,6 +23,6 @@ model User {
   status String @default("ACTIVE") //Active , banned, suspended
   createdAt DateTime @default(now())
   lastLogin DateTime?
-  privilages String[] @default([])
+  privilages String[] @default([]) //["create product","update_product", "delete_product"]
 
 }
