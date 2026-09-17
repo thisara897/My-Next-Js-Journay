@@ -1,16 +1,60 @@
 import prisma from "@/lib/prisma";
-import { NextRequest } from "next/server";
+import { compare } from "bcryptjs";
+import { NextRequest, NextResponse } from "next/server";
+import * as jose from "jose";
 
 export async function POST(request : NextRequest){
-    const body = await request.json();
-    console.log(body);
+        const body = await request.json();
+        console.log(body);
 
-    const user = await prisma.user.findFirst(
-        {
-            where : {
-                email : body.email
-            }
+        if(body.email == null){
+            return NextResponse.json(
+                {
+                    message : "Email is required"
+                }
+            )
         }
-)
+
+        const user = await prisma.user.findFirst(
+            {
+                where : {
+                    email : body.email
+                }
+            }
+    )
+    console.log(user)
+
+    if(user == null){
+        return NextResponse.json(
+            {
+                message : "User not found"
+            }
+        )
+    }
+    const isPasswordValid = await compare(body.password, user.password)
+
+    if(isPasswordValid){
+
+        const secretText = process.env.JOSE_SECRET || "TemporySecret8929%"
+        const secret = new TextEncoder().encode(secretText)
+        
+        const token = await new jose.SignJWT({
+            email : user.email,
+            firstName : user.firstName,
+            lastName : user.lastName,
+            role : user.role,
+            privilages : user.privilages
+        }).setProtectedHeader({alg : "HS256"}).sign(secret)
+
+        
+
+    }else{
+        return NextResponse.json(
+            {
+                message : "Invalid password"
+            }
+        )
+    }
+
 
 }
