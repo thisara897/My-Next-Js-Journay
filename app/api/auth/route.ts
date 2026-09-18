@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { compare } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
+import { strict } from "assert";
 
 export async function POST(request : NextRequest){
         const body = await request.json();
@@ -46,7 +47,25 @@ export async function POST(request : NextRequest){
             privilages : user.privilages
         }).setProtectedHeader({alg : "HS256"}).sign(secret)
 
-        
+        const response = NextResponse.json(
+            {
+                message :"Login successful",
+                role : user.role,
+            }
+        )
+
+        response.cookies.set(
+            {
+                name : "login-token",
+                value : token,
+                httpOnly : true,
+                secure : false,
+                sameSite : "lax",
+                maxAge : 60 * 60 * 24 * 7 // 7 days
+            }
+        )
+
+        return response
 
     }else{
         return NextResponse.json(
