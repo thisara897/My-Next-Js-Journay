@@ -6,12 +6,23 @@ import { strict } from "assert";
 
 export async function POST(request : NextRequest){
         const body = await request.json();
-        console.log(body);
+        console.log(body); 
 
         if(body.email == null){
             return NextResponse.json(
                 {
                     message : "Email is required"
+                },
+                {
+                    status : 422
+                }
+            )
+        }
+
+        if(body.password == null){
+            return NextResponse.json(
+                {
+                    message : "Password is required"
                 }
             )
         }
@@ -23,23 +34,49 @@ export async function POST(request : NextRequest){
                 }
             }
     )
-    console.log(user)
+
 
     if(user == null){
         return NextResponse.json(
             {
                 message : "User not found"
+            },
+            {
+                status : 404
             }
         )
     }
     const isPasswordValid = await compare(body.password, user.password)
 
+    if(user.status != "ACTIVE"){
+        return NextResponse.json(
+            {
+                message : "Your account is disabled. Please contact the administrator."
+            },
+            {
+                status : 403
+            }
+        )
+    }
+
     if(isPasswordValid){
+
+        await prisma.user.update(
+            {
+                where : { 
+                    id : user.id
+                },
+                data : {
+                    lastLogin : new Date()
+                }
+            }
+        )
 
         const secretText = process.env.JOSE_SECRET || "TemporySecret8929%"
         const secret = new TextEncoder().encode(secretText)
         
         const token = await new jose.SignJWT({
+            id : user.id,
             email : user.email,
             firstName : user.firstName,
             lastName : user.lastName,
@@ -71,6 +108,9 @@ export async function POST(request : NextRequest){
         return NextResponse.json(
             {
                 message : "Invalid password"
+            },
+            {
+                status : 401
             }
         )
     }
