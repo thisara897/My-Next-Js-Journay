@@ -9,7 +9,7 @@ export async function GET(request : NextRequest){
     const secret = new TextEncoder().encode(secretText)
 
     const user = await jose.jwtVerify(
-        loginToken,
+        loginToken || "",
         secret
     )
 

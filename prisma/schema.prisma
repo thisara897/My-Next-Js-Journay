@@ -25,5 +25,6 @@ model User {
   lastLogin DateTime?
   privilages String[] @default([]) //["users:add", "users:edit", "users:read"]
   gender String? @default("MALE") //MALE, FEMALE, OTHER
+  profileImage String @default("/images/default-profile.png")
 
 }
